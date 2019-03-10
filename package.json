@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "nodemon ./bin/www"
+    "dev": "nodemon ./bin/www",
+    "db:migrate": "node ./scripts/db/migrate",
+    "db:migrate:test": "ENV=test node ./scripts/db/migrate"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
@@ -19,6 +21,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "child-process-promise": "^2.2.1",
     "jest": "^24.1.0",
     "nodemon": "^1.18.10",
     "superagent": "^4.1.0",
