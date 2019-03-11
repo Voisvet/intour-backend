@@ -36,7 +36,38 @@ router.get('/excursions', function(req, res, next) {
           type: ''
         };
       });
-      res.send(excursions);
+      res.send({
+        excursions,
+        status_code: 0,
+        error: ''
+      });
+    });
+});
+
+router.get('/excursions/:id', function(req, res, next) {
+  db.sequelize.model('Excursion').findByPk(req.params.id, {
+    include: [{
+      model: db.sequelize.model('ExcursionImage'),
+      as: 'Images'
+    }, {
+      model: db.sequelize.model('ExcursionSchedule'),
+      as: 'Schedule'
+    }]
+  })
+    .then(excursion => {
+      res.send({
+        status_code: 0,
+        error: '',
+        excursion: {
+          id: excursion.id,
+          images: excursion.Images.map(image => image.link),
+          description: excursion.description,
+          starting_point: excursion.starting_point,
+          available_dates: excursion.Schedule,
+          price_adult: excursion.adult_ticket_cost,
+          price_child: excursion.child_ticket_cost
+        }
+      })
     });
 });
 
