@@ -48,9 +48,18 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   User.associate = function(models) {
-    User.belongsTo(models.Customer);
-    User.belongsTo(models.Agent);
-    User.belongsTo(models.ExcursionOperator);
+    User.belongsTo(models.Customer, {
+      foreignKey: 'customerId',
+      targetKey: 'id'
+    });
+    User.belongsTo(models.Agent, {
+      foreignKey: 'agentId',
+      targetKey: 'id'
+    });
+    User.belongsTo(models.ExcursionOperator, {
+      foreignKey: 'operatorId',
+      targetKey: 'id'
+    });
   };
   return User;
 };
