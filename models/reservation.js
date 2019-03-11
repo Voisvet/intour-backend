@@ -1,17 +1,67 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Reservetion = sequelize.define('Reservation', {
-    id: DataTypes.INTEGER,
-    excursionId: DataTypes.INTEGER,
-    reservationDate: DataTypes.DATE,
-    excursionDate: DataTypes.DATEONLY,
-    excursionTime: DataTypes.TIME,
-    amountOfAdultTickets: DataTypes.INTEGER,
-    amountOfChildTickets: DataTypes.INTEGER,
-    totalCost: DataTypes.DECIMAL(2),
-    status: DataTypes.ENUM('new', 'paid'),
-    paymentDate: DataTypes.DATE,
-    customerId: DataTypes.INTEGER
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    excursionId: {
+      references: {
+        model: 'Excursions',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+      type: DataTypes.INTEGER
+    },
+    reservationDate: {
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      type: DataTypes.DATE
+    },
+    excursionDate: {
+      allowNull: false,
+      type: DataTypes.DATEONLY
+    },
+    excursionTime: {
+      allowNull: false,
+      type: DataTypes.TIME
+    },
+    amountOfAdultTickets: {
+      allowNull: false,
+      defaultValue: 0,
+      type: DataTypes.INTEGER
+    },
+    amountOfChildTickets: {
+      allowNull: false,
+      defaultValue: 0,
+      type: DataTypes.INTEGER
+    },
+    totalCost: {
+      allowNull: false,
+      defaultValue: 0,
+      type: DataTypes.DECIMAL(2)
+    },
+    status: {
+      allowNull: false,
+      defaultValue: 'new',
+      type: DataTypes.ENUM('new', 'paid')
+    },
+    paymentDate: {
+      defaultValue: null,
+      type: DataTypes.DATE
+    },
+    customerId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Customers',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL'
+    }
   }, {});
   Reservetion.associate = function(models) {
     Reservetion.belongsTo(models.Excursion, {
