@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-/* GET users listing. */
+/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.send('This is an admin endpoint');
+  res.send({
+    status: 0,
+    message: 'This is an endpoint for mobile app'
+  });
 });
 
 module.exports = router;
