@@ -11,13 +11,23 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING
     },
+    type: {
+      allowNull: false,
+      type: DataTypes.STRING
+    },
     duration: {
       allowNull: false,
       type: DataTypes.INTEGER
     },
     services: {
       allowNull: false,
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
+      get() {
+        return this.getDataValue('services').split(';')
+      },
+      set(val) {
+        this.setDataValue('services', val.join(';'));
+      }
     },
     description: {
       allowNull: false,

@@ -12,13 +12,23 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      type: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
       duration: {
         allowNull: false,
         type: Sequelize.INTEGER
       },
       services: {
         allowNull: false,
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
+        get() {
+          return this.getDataValue('services').split(';')
+        },
+        set(val) {
+          this.setDataValue('services', val.join(';'));
+        }
       },
       description: {
         allowNull: false,
