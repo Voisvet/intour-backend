@@ -5,7 +5,7 @@ const router = express.Router();
 router.get('/', function(req, res, next) {
   res.send({
     status: 0,
-    message: 'This is an endpoint for mobile app'
+    errorMessage: 'This is an endpoint for mobile app'
   });
 });
 
