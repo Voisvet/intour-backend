@@ -55,6 +55,35 @@ router.get('/excursions/:id', function(req, res, next) {
     }]
   })
     .then(excursion => {
+      const today = new Date();
+
+      const available_dates = excursion.Schedule.map(entry => {
+        let diff = 0;
+
+        const hours = +entry.time.split(':')[0];
+        const minutes = +entry.time.split(':')[1];
+        const seconds = +entry.time.split(':')[2];
+
+        if (today.getDay() < weekDays.indexOf(entry.weekDay)) {
+          diff = weekDays.indexOf(entry.weekDay) - today.getDay();
+        } else if (today.getDay() > weekDays.indexOf(entry.weekDay)) {
+          diff = 7 - today.getDay() + weekDays.indexOf(entry.weekDay);
+        } else {
+          if ((hours * 60 + minutes + 30) < (today.getHours() * 60 + today.getMinutes())) {
+            diff = 7;
+          }
+        }
+        const newDate = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate() + diff,
+          hours,
+          minutes,
+          seconds,
+        );
+        return +newDate;
+      });
+
       res.send({
         status_code: 0,
         error: '',
@@ -63,9 +92,9 @@ router.get('/excursions/:id', function(req, res, next) {
           images: excursion.Images.map(image => image.link),
           description: excursion.description,
           starting_point: excursion.starting_point,
-          available_dates: excursion.Schedule,
           price_adult: excursion.adult_ticket_cost,
-          price_child: excursion.child_ticket_cost
+          price_child: excursion.child_ticket_cost,
+          available_dates
         }
       })
     });
