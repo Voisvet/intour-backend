@@ -1,8 +1,10 @@
 {
   "development": {
-    "hashSecret": "thisisasecretstring"
+    "hashSecret": "thisisasecretstring",
+    "tokenSecret": "thisisasecretstring"
   },
   "test": {
-    "hashSecret": "thisisasecretstring"
+    "hashSecret": "thisisasecretstring",
+    "tokenSecret": "thisisasecretstring"
   }
 }
