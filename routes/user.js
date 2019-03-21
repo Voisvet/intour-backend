@@ -51,8 +51,24 @@ router.post('/new', async (req, res, next) => {
       // Add new customer to agent's list of customers
       if (agent) await agent.addCustomers(customer, {transaction});
 
+      // Check if we have user with the same login in DB
+      let user = await db.sequelize.model('User').findOne({
+        where: {
+          login: phone
+        }
+      });
+
+      if (user) {
+        res.send({
+          status: -1,
+          errorMessage: 'This phone number is already used'
+        });
+        await transaction.rollback();
+        return;
+      }
+
       // Create new user
-      const user = await db.sequelize.model('User').create({
+      user = await db.sequelize.model('User').create({
         login: phone,
         passwordHash: helpers.hash(password),
         accountType: 'customer'
@@ -71,14 +87,17 @@ router.post('/new', async (req, res, next) => {
           customerId: customer.id,
           accountType: user.accountType
         }, config.tokenSecret, {
-          expiresIn: '24h'
+          expiresIn: '30d'
         })
       });
     } catch (err) {
       if (err && transaction) await transaction.rollback();
-      throw new Error('Something went wrong when stored data to DB');
+      res.status(500);
+      res.send({
+        status: -1,
+        errorMessage: 'Something went wrong when storing data to DB'
+      });
     }
-
   } else {
     res.send({
       status: -1,
