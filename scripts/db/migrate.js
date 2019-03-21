@@ -8,7 +8,7 @@ const env_mode = process.env.ENV || 'development';
 (async () => {
   try {
     // Migrate the DB
-    await spawn('./node_modules/.bin/sequelize', ['db:migrate', `--env=${env_mode}`], spawnOptions);
+    await spawn('./node_modules/.bin/sequelize', ['db:migrate', `--env=${env_mode}`, '--config=./config/dbConfig.json'], spawnOptions);
     console.log('*************************');
     console.log('Migration successfulnpm a');
   } catch (err) {
