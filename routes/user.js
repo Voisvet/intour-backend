@@ -106,4 +106,42 @@ router.post('/new', async (req, res, next) => {
   }
 });
 
+router.get('/token', async (req, res) => {
+  const login = checkString(req.query.login);
+  const password = checkString(req.query.pass);
+
+  if (login && password) {
+    const user = await db.sequelize.model('User').findOne({
+      where: {
+        login,
+        passwordHash: helpers.hash(password)
+      }
+    });
+
+    if (user && user.accountType === 'customer') {
+      res.send({
+        status: 0,
+        errorMessage: '',
+        token: jwt.sign({
+          userId: user.id,
+          customerId: user.customerId,
+          accountType: user.accountType
+        }, config.tokenSecret, {
+          expiresIn: '30d'
+        })
+      });
+    } else {
+      res.send({
+        status: -1,
+        errorMessage: 'Login not found or wrong password'
+      })
+    }
+  } else {
+    res.send({
+      status: -1,
+      errorMessage: 'Missing login or password'
+    });
+  }
+});
+
 module.exports = router;
