@@ -191,4 +191,84 @@ router.use(async(req, res, next) => {
   next();
 });
 
+// Get list of all reservations
+router.post('/reservations', async (req, res) => {
+  const excursionId = (typeof(req.body.excursion_id) == 'number'
+    && req.body.excursion_id >= 0) ? req.body.excursion_id: false;
+  const date = (typeof(req.body.date) == 'number'
+    && req.body.date>= 0) ? req.body.date: false;
+  const amountOfAdultTickets = (typeof(req.body.adult_tickets_amount) == 'number'
+    && req.body.adult_tickets_amount >= 0) ? req.body.adult_tickets_amount : false;
+  const amountOfChildTickets = (typeof(req.body.child_tickets_amount) == 'number'
+    && req.body.child_tickets_amount >= 0) ? req.body.child_tickets_amount : false;
+
+  // Check required fields
+  if (excursionId && date && amountOfAdultTickets && amountOfChildTickets) {
+    const parsedDate = new Date(date);
+
+    // Check that excursion exists and takes place at specified time
+    const excursion = await db.sequelize.model("Excursion").findByPk(excursionId, {
+      include: [{
+        model: db.sequelize.model('ExcursionSchedule'),
+        as: 'Schedule',
+        where: {
+          weekDay: weekDays[parsedDate.getDay()],
+          time: `${parsedDate.getHours()}:${parsedDate.getMinutes()}:00`
+        }
+      }]
+    });
+
+    if (!excursion) {
+      res.send({
+        status: -1,
+        errorMessage: 'Specified excursion doesn\'t exist or take place at that day and time'
+      });
+      return;
+    }
+
+    const totalCost = amountOfAdultTickets * excursion.adult_ticket_cost
+              + amountOfChildTickets * excursion.child_ticket_cost;
+
+    // Begin transaction for changing data
+    let transaction;
+    try {
+      transaction = await db.sequelize.transaction();
+
+      const reservation = await db.sequelize.model('Reservation').create({
+        excursionDate: parsedDate,
+        excursionTime: `${parsedDate.getHours()}:${parsedDate.getMinutes()}:00`,
+        amountOfAdultTickets,
+        amountOfChildTickets,
+        totalCost: totalCost
+      }, {transaction});
+
+      await reservation.setExcursion(excursion, {transaction});
+
+      await req.user.user.Customer.addReservations(reservation, {transaction});
+
+      await transaction.commit();
+
+      res.send({
+        status: 0,
+        errorMessage: '',
+        total_cost: +totalCost.toFixed(2),
+        id: reservation.id
+      });
+    } catch (err) {
+      if (err && transaction) await transaction.rollback();
+      console.log(err);
+      res.status(500);
+      res.send({
+        status: -1,
+        errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+      });
+    }
+  } else {
+    res.send({
+      status: -1,
+      errorMessage: 'Missing required data'
+    });
+  }
+});
+
 module.exports = router;
