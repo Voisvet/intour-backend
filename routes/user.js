@@ -271,4 +271,36 @@ router.post('/reservations', async (req, res) => {
   }
 });
 
+router.get('/reservations', async (req, res) => {
+  console.log(111);
+  const reservations = await req.user.user.Customer.getReservations({
+    include: [{
+      model: db.sequelize.model('Excursion'),
+      as: 'Excursion'
+    }]
+  });
+
+  res.send({
+    status: 0,
+    errorMessage: '',
+    reservations: reservations.map(reservation => {
+      const splittedTime = reservation.excursionTime.split(":");
+      const endHours = (+splittedTime[0] + Math.floor(reservation.Excursion.duration / 60)) % 24;
+      const endMinutes = +splittedTime[1] + reservation.Excursion.duration % 60;
+
+      return {
+        id: reservation.id,
+        title: reservation.Excursion.title,
+        total_cost: +reservation.totalCost,
+        date: reservation.excursionDate,
+        start_time: reservation.excursionTime,
+        end_time: `${endHours}:${endMinutes}:00`,
+        status: reservation.status,
+        adult_tickets_amount: reservation.amountOfAdultTickets,
+        child_tickets_amount: reservation.amountOfChildTickets
+      }
+    })
+  });
+});
+
 module.exports = router;
