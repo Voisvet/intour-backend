@@ -1,6 +1,7 @@
 const db = require('../models');
 const helpers = require('../lib/helpers');
 const jwt = require('jsonwebtoken');
+const jwtMiddleware = require('express-jwt');
 const express = require('express');
 const router = express.Router();
 
@@ -142,6 +143,21 @@ router.get('/token', async (req, res) => {
       errorMessage: 'Missing login or password'
     });
   }
+});
+
+router.use(jwtMiddleware({
+  secret: config.tokenSecret,
+  getToken: (req) => {
+    if (req.query.token) {
+      return req.query.token;
+    }
+    return null;
+  }
+}));
+
+router.get('/reservations', async (req, res) => {
+  console.log(req.user);
+  res.send({});
 });
 
 module.exports = router;
