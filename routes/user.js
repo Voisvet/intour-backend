@@ -157,9 +157,38 @@ router.use(jwtMiddleware({
   }
 }));
 
-router.get('/reservations', async (req, res) => {
-  console.log(req.user);
-  res.send({});
+// Check account type and start extract user from database
+router.use(async(req, res, next) => {
+  if (req.user.accountType !== 'customer') {
+    res.status(401);
+    res.send({
+      status: -1,
+      errorMessage: 'This user cannot use the app'
+    });
+    return;
+  }
+
+  req.user.user = await db.sequelize.model("User")
+    .findByPk(req.user.userId, {
+      include: [{
+        model: db.sequelize.model('Customer'),
+        as: 'Customer',
+        where: {
+          id: req.user.customerId
+        }
+      }]
+    });
+
+  if (!req.user.user) {
+    res.status(401);
+    res.send({
+      status: -1,
+      errorMessage: 'Your account doesn\'t exist'
+    });
+    return;
+  }
+
+  next();
 });
 
 module.exports = router;
