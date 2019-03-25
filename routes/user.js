@@ -303,4 +303,63 @@ router.get('/reservations', async (req, res) => {
   });
 });
 
+router.get('/reservations/:id', async (req, res) => {
+  const id = (typeof(+req.params.id) == 'number'
+    && +req.params.id >= 0) ? +req.params.id: false;
+
+  if (id) {
+    const reservation = (await req.user.user.Customer.getReservations({
+      where: {id},
+      include: [{
+        model: db.sequelize.model('Excursion'),
+        as: 'Excursion',
+        include: [{
+          model: db.sequelize.model('ExcursionImage'),
+          as: 'Images'
+        }]
+      }]
+    }))[0];
+
+    if(!reservation) {
+      res.status(404);
+      res.send({
+        status: -1,
+        errorMessage: 'Reservation not found'
+      });
+      return;
+    }
+
+    const splittedTime = reservation.excursionTime.split(":");
+    const endHours = (+splittedTime[0] + Math.floor(reservation.Excursion.duration / 60)) % 24;
+    const endMinutes = +splittedTime[1] + reservation.Excursion.duration % 60;
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      reservation: {
+        id: reservation.id,
+        title: reservation.Excursion.title,
+        images: reservation.Excursion.Images.map(image => image.link),
+        start_time: reservation.excursionTime,
+        end_time: `${endHours}:${endMinutes}:00`,
+        duration: reservation.Excursion.duration,
+        type: reservation.Excursion.type,
+        services: reservation.Excursion.services,
+        description: reservation.Excursion.description,
+        starting_point: reservation.Excursion.starting_point,
+        date: reservation.excursionDate,
+        total_cost: reservation.totalCost,
+        status: reservation.status,
+        adult_tickets_amount: reservation.amountOfAdultTickets,
+        child_tickets_amount: reservation.amountOfChildTickets
+      }
+    });
+  } else {
+    res.send({
+      status: -1,
+      errorMessage: 'ID must be a number'
+    });
+  }
+});
+
 module.exports = router;
