@@ -2,9 +2,7 @@ const db = require('../models');
 const express = require('express');
 const router = express.Router();
 
-weekDays = [
-  'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
-];
+const weekDays = require('../lib/helpers').weekDays;
 
 router.get('/excursions', function(req, res, next) {
   const date = new Date(+req.query.date);

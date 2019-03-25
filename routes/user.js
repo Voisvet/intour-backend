@@ -8,6 +8,8 @@ const router = express.Router();
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
+const weekDays = require('../lib/helpers').weekDays;
+
 function checkString(string) {
   return typeof(string) == "string"
     && string.trim().length > 0
