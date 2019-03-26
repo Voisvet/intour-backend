@@ -256,7 +256,6 @@ router.post('/reservations', async (req, res) => {
       });
     } catch (err) {
       if (err && transaction) await transaction.rollback();
-      console.log(err);
       res.status(500);
       res.send({
         status: -1,
@@ -272,7 +271,6 @@ router.post('/reservations', async (req, res) => {
 });
 
 router.get('/reservations', async (req, res) => {
-  console.log(111);
   const reservations = await req.user.user.Customer.getReservations({
     include: [{
       model: db.sequelize.model('Excursion'),
