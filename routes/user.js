@@ -362,4 +362,37 @@ router.get('/reservations/:id', async (req, res) => {
   }
 });
 
+router.post('/reservations/:id/cancel', async (req, res) => {
+  const id = (typeof(+req.params.id) == 'number'
+    && +req.params.id >= 0) ? +req.params.id: false;
+
+  if (id) {
+    const reservation = (await req.user.user.Customer.getReservations({
+      where: {id}
+    }))[0];
+
+    if (reservation.status !== 'new') {
+      res.send({
+        status: -1,
+        errorMessage: 'Cannot cancel the excursion'
+      });
+    }
+
+    reservation.setDataValue('status', 'cancelled');
+
+    reservation.save();
+
+    res.send({
+      status: 0,
+      errorMessage: ''
+    });
+  } else {
+    res.send({
+      status: -1,
+      errorMessage: 'ID must be a number'
+    });
+  }
+
+});
+
 module.exports = router;
