@@ -48,7 +48,7 @@ module.exports = {
       status: {
         allowNull: false,
         defaultValue: 'new',
-        type: Sequelize.ENUM('new', 'paid')
+        type: Sequelize.ENUM('new', 'paid', 'cancelled')
       },
       paymentDate: {
         defaultValue: null,
