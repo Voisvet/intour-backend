@@ -109,6 +109,45 @@ router.post('/new', async (req, res, next) => {
   }
 });
 
+router.get('/regions', async (req, res) => {
+  try {
+
+    // const excursion = await db.sequelize.model("Excursion").findByPk(excursionId, {
+    //   include: [{
+    //     model: db.sequelize.model('ExcursionSchedule'),
+    //     as: 'Schedule',
+    //     where: {
+    //       weekDay: weekDays[parsedDate.getDay()],
+    //       time: `${parsedDate.getHours()}:${parsedDate.getMinutes()}:00`
+    //     }
+    //   }]
+    // });
+    const countries = await db.sequelize.model('Country').findAll({
+      include: [{
+        model: db.sequelize.model('City'),
+        as: 'Cities'
+      }]
+    });
+
+    const regions = countries.map(country => ({
+      name: country.name,
+      id: country.id,
+      cities: country.Cities.map(city => ({
+        name: city.name,
+        id: city.id
+      }))
+    }));
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      regions
+    })
+  } catch (err) {
+
+  }
+});
+
 router.get('/token', async (req, res) => {
   const login = checkString(req.query.login);
   const password = checkString(req.query.pass);
