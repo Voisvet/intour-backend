@@ -45,9 +45,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.DECIMAL(2)
     },
-    region: {
-      allowNull: false,
-      type: DataTypes.STRING
+    cityId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Cities',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL'
     },
     excursionOperatorId: {
       type: DataTypes.INTEGER,
@@ -69,6 +74,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'Schedule',
       foreignKey: 'excursionId',
       sourceKey: 'id'
+    });
+    Excursion.belongsTo(models.City, {
+      foreignKey: 'cityId',
+      targetKey: 'id'
     });
   };
   return Excursion;
