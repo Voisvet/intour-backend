@@ -1,10 +1,12 @@
 {
   "development": {
     "hashSecret": "thisisasecretstring",
-    "tokenSecret": "thisisasecretstring"
+    "tokenSecret": "thisisasecretstring",
+    "imageServerBaseUrl": "http://localhost:3000"
   },
   "test": {
     "hashSecret": "thisisasecretstring",
-    "tokenSecret": "thisisasecretstring"
+    "tokenSecret": "thisisasecretstring",
+    "imageServerBaseUrl": "http://localhost:3000"
   }
 }

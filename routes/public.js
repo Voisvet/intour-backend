@@ -2,6 +2,9 @@ const db = require('../models');
 const express = require('express');
 const router = express.Router();
 
+const env = process.env.NODE_ENV || 'development';
+const config = require('../config/config')[env];
+
 const weekDays = require('../lib/helpers').weekDays;
 
 router.get('/excursions', function(req, res, next) {
@@ -30,8 +33,8 @@ router.get('/excursions', function(req, res, next) {
           start_time: excursion.Schedule[0].time,
           duration: excursion.duration,
           services: excursion.services,
-          image: excursion.Images[0].link,
-          type: ''
+          image: config['imageServerBaseUrl'] + excursion.Images[0].link,
+          type: excursion.type
         };
       });
       res.send({
@@ -87,7 +90,7 @@ router.get('/excursions/:id', function(req, res, next) {
         errorMessage: '',
         excursion: {
           id: excursion.id,
-          images: excursion.Images.map(image => image.link),
+          images: excursion.Images.map(image => config['imageServerBaseUrl'] + image.link),
           description: excursion.description,
           starting_point: excursion.starting_point,
           price_adult: excursion.adult_ticket_cost,
