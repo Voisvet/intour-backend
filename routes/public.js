@@ -8,7 +8,7 @@ router.get('/excursions', function(req, res, next) {
   const date = new Date(+req.query.date);
   db.sequelize.model('Excursion').findAll({
     where: {
-      region: req.query.region,
+      cityId: req.query.region_id,
     },
     include: [{
       model: db.sequelize.model('ExcursionImage'),
