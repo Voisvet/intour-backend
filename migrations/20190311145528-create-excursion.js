@@ -40,11 +40,11 @@ module.exports = {
       },
       adult_ticket_cost: {
         allowNull: false,
-        type: Sequelize.DECIMAL(2)
+        type: Sequelize.DECIMAL(6,2)
       },
       child_ticket_cost: {
         allowNull: false,
-        type: Sequelize.DECIMAL(2)
+        type: Sequelize.DECIMAL(6,2)
       },
       region: {
         allowNull: false,

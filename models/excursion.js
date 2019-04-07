@@ -39,11 +39,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     adult_ticket_cost: {
       allowNull: false,
-      type: DataTypes.DECIMAL(2)
+      type: DataTypes.DECIMAL(6,2)
     },
     child_ticket_cost: {
       allowNull: false,
-      type: DataTypes.DECIMAL(2)
+      type: DataTypes.DECIMAL(6,2)
     },
     cityId: {
       type: DataTypes.INTEGER,
