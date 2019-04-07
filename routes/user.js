@@ -144,7 +144,10 @@ router.get('/regions', async (req, res) => {
       regions
     })
   } catch (err) {
-
+    res.status(500).send({
+      status: -1,
+      errorMessage: 'Database is not available now. Try again later.'
+    })
   }
 });
 
