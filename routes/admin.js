@@ -65,7 +65,7 @@ router.use(jwtMiddleware({
 
 // Check account type and start extract user from database
 router.use(async(req, res, next) => {
-  if (['agent', 'operator', 'admin'].includes(req.user.accountType)) {
+  if (!['agent', 'operator', 'admin'].includes(req.user.accountType)) {
     res.status(401);
     res.send({
       status: -1,
@@ -79,17 +79,11 @@ router.use(async(req, res, next) => {
       include: [
         {
           model: db.sequelize.model('Agent'),
-          as: 'Agent',
-          where: {
-            id: req.user.agentId
-          }
+          as: 'Agent'
         },
         {
           model: db.sequelize.model('ExcursionOperator'),
-          as: 'Operator',
-          where: {
-            id: req.user.operatorId
-          }
+          as: 'ExcursionOperator'
         }
       ]
     });
@@ -104,6 +98,47 @@ router.use(async(req, res, next) => {
   }
 
   next();
+});
+
+router.get('/excursions', function(req, res, next) {
+  const date = new Date(+req.query.date);
+  db.sequelize.model('Excursion').findAll({
+    include: [{
+      model: db.sequelize.model('ExcursionImage'),
+      as: 'Images'
+    }, {
+      model: db.sequelize.model('ExcursionSchedule'),
+      as: 'Schedule'
+    }]
+  })
+    .then(result => {
+      const excursions = result.map(excursion => {
+        return {
+          id: excursion.id,
+          title: excursion.title,
+          duration: excursion.duration,
+          services: excursion.services,
+          images: excursion.Images.map(image => image.link),
+          type: excursion.type,
+          description: excursion.description,
+          starting_point: excursion.starting_point,
+          schedules: excursion.Schedule.map(schedule => ({
+            weekDay: schedule.weekDay,
+            time: schedule.time
+          })),
+          city_id: excursion.cityId,
+          adult_ticket_cost: excursion.adult_ticket_cost,
+          child_ticket_cost: excursion.child_ticket_cost,
+          excursion_operator_id: excursion.excursionOperatorId
+        };
+      });
+
+      res.send({
+        excursions,
+        status: 0,
+        errorMessage: ''
+      });
+    });
 });
 
 module.exports = router;
