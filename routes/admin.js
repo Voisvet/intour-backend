@@ -9,7 +9,7 @@ const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
 function checkString(string) {
-  return typeof(string) == "string"
+  return typeof (string) == "string"
   && string.trim().length > 0
     ? string.trim() : false;
 }
@@ -64,7 +64,7 @@ router.use(jwtMiddleware({
 }));
 
 // Check account type and start extract user from database
-router.use(async(req, res, next) => {
+router.use(async (req, res, next) => {
   if (!['agent', 'operator', 'admin'].includes(req.user.accountType)) {
     res.status(401);
     res.send({
@@ -100,7 +100,7 @@ router.use(async(req, res, next) => {
   next();
 });
 
-router.get('/excursions', function(req, res, next) {
+router.get('/excursions', function (req, res, next) {
   const date = new Date(+req.query.date);
   db.sequelize.model('Excursion').findAll({
     include: [{
@@ -139,6 +139,108 @@ router.get('/excursions', function(req, res, next) {
         errorMessage: ''
       });
     });
+});
+
+router.post('/excursions', async function (req, res, next) {
+  const type = checkString(req.body.type);
+  const title = checkString(req.body.title);
+  const description = checkString(req.body.description);
+  const startingPoint = checkString(req.body.starting_point);
+  const cityId = typeof (req.body.city_id) == 'number'
+    && req.body.city_id > 0 ? req.body.city_id : false;
+  const duration = typeof (req.body.duration) == 'number'
+    && req.body.duration > 0 ? req.body.duration : false;
+  const adultTicketCost = typeof (req.body.adult_ticket_cost) == 'number'
+    && req.body.adult_ticket_cost > 0 ? req.body.adult_ticket_cost : false;
+  const childTicketCost = typeof (req.body.child_ticket_cost) == 'number'
+    && req.body.child_ticket_cost > 0 ? req.body.child_ticket_cost : false;
+  const operatorId = typeof (req.body.excursion_operator_id) == 'number'
+    && req.body.excursion_operator_id > 0 ? req.body.excursion_operator_id : false;
+  const services = req.body.services instanceof Array
+    && req.body.services.every(service => typeof (service) == 'string') ? req.body.services : false;
+  const images = req.body.images instanceof Array && req.body.images.length > 0
+    && req.body.images.every(image => typeof (image) == 'string') ? req.body.images : false;
+  const schedules = req.body.schedules instanceof Array
+    && req.body.schedules.every(schedule =>
+      typeof (schedule) == 'object'
+      && ('week_day' in schedule && helpers.weekDays.includes(schedule.week_day))
+      && ('time' in schedule && typeof(schedule.time) == 'string' && schedule.time.length === 8))
+    ? req.body.schedules : false;
+
+  if (!(type && title && description && startingPoint && cityId && duration
+        && adultTicketCost && childTicketCost && services && images && schedules)) {
+    res.send({
+      status: -1,
+      errorMessage: 'Missing required fields'
+    });
+    return;
+  }
+
+  const city = await db.sequelize.model('City').findByPk(cityId);
+  if (!city) {
+    res.send({
+      status: -1,
+      errorMessage: 'Specified city does not exist'
+    });
+    return;
+  }
+
+  let operator;
+  if (operatorId) {
+    operator = await db.sequelize.model('ExcursionOperator').findByPk(operatorId);
+    if (!operator) {
+      res.send({
+        status: -1,
+        errorMessage: 'Specified operator does not exist'
+      });
+      return;
+    }
+  }
+
+  let transaction;
+  try {
+    transaction = await db.sequelize.transaction();
+
+    const imageInstances = await Promise.all(images.map(image =>
+      db.sequelize.model('ExcursionImage').create({link: image}, {transaction})));
+
+    const scheduleInstances = await Promise.all(schedules.map(schedule =>
+      db.sequelize.model('ExcursionSchedule').create({
+        weekDay: schedule.week_day,
+        time: schedule.time
+      }, {transaction})));
+
+    const excursionInstance = await db.sequelize.model('Excursion').create({
+      type,
+      title,
+      cityId,
+      duration,
+      services,
+      description,
+      starting_point: startingPoint,
+      adult_ticket_cost: adultTicketCost,
+      child_ticket_cost: childTicketCost
+    }, {transaction});
+
+    await excursionInstance.setImages(imageInstances, {transaction});
+    await excursionInstance.setSchedule(scheduleInstances, {transaction});
+
+    if (operator) await operator.addExcursion(excursionInstance, {transaction});
+
+    await transaction.commit();
+
+    res.send({
+      id: excursionInstance.id,
+      status: 0,
+      errorMessage: ''
+    });
+  } catch (err) {
+    if (err && transaction) await transaction.rollback();
+    res.status(500).send({
+      status: -1,
+      errorMessage: 'Something went wrong... Try again later or contact administrator'
+    });
+  }
 });
 
 module.exports = router;
