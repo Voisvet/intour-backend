@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     accountType: {
       allowNull: false,
-      type: DataTypes.ENUM('customer', 'agent', 'operator')
+      type: DataTypes.ENUM('customer', 'agent', 'operator', 'admin')
     },
     customerId: {
       type: DataTypes.INTEGER,

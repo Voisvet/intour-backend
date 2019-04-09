@@ -19,7 +19,7 @@ module.exports = {
       },
       accountType: {
         allowNull: false,
-        type: Sequelize.ENUM('customer', 'agent', 'operator')
+        type: Sequelize.ENUM('customer', 'agent', 'operator', 'admin')
       },
       customerId: {
         type: Sequelize.INTEGER,
