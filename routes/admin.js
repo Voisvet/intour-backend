@@ -243,4 +243,29 @@ router.post('/excursions', async function (req, res, next) {
   }
 });
 
+router.post('/image', function(req, res, next) {
+  const uploadFile = req.files.image;
+  const fileName = '111.jpg';
+  if (uploadFile) {
+
+    uploadFile.mv(
+      `${__dirname}/public/files/${fileName}`,
+      err => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+
+        res.send({
+          file: `public/${req.files.file.name}`,
+        });
+      },
+    );
+  } else {
+    res.send({
+      status: -1,
+      errorMessage: 'Image is not defined in your request'
+    });
+  }
+});
+
 module.exports = router;
