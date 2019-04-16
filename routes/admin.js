@@ -116,7 +116,7 @@ router.get('/excursions', function (req, res, next) {
         return {
           id: excursion.id,
           title: excursion.title,
-          duration: excursion.duration,
+          duration: +excursion.duration,
           services: excursion.services,
           images: excursion.Images.map(image => image.link),
           type: excursion.type,

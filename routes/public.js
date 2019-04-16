@@ -29,7 +29,7 @@ router.get('/excursions', function(req, res, next) {
         return {
           id: excursion.id,
           title: excursion.title,
-          price: excursion.adult_ticket_cost,
+          price: +excursion.adult_ticket_cost,
           start_time: excursion.Schedule[0].time,
           duration: excursion.duration,
           services: excursion.services,
@@ -93,8 +93,8 @@ router.get('/excursions/:id', function(req, res, next) {
           images: excursion.Images.map(image => config['imageServerBaseUrl'] + image.link),
           description: excursion.description,
           starting_point: excursion.starting_point,
-          price_adult: excursion.adult_ticket_cost,
-          price_child: excursion.child_ticket_cost,
+          price_adult: +excursion.adult_ticket_cost,
+          price_child: +excursion.child_ticket_cost,
           available_dates
         }
       })
