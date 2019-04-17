@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
     totalCost: {
       allowNull: false,
       defaultValue: 0,
-      type: DataTypes.DECIMAL(2)
+      type: DataTypes.DECIMAL(9,2)
     },
     status: {
       allowNull: false,
