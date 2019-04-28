@@ -332,7 +332,7 @@ router.get('/reservations', async (req, res) => {
         id: reservation.id,
         title: reservation.Excursion.title,
         total_cost: +reservation.totalCost,
-        date: reservation.excursionDate,
+        date: +new Date(reservation.excursionDate),
         start_time: reservation.excursionTime,
         end_time: `${endHours}:${endMinutes}:00`,
         status: reservation.status,
