@@ -2,11 +2,19 @@
   "development": {
     "hashSecret": "thisisasecretstring",
     "tokenSecret": "thisisasecretstring",
-    "imageServerBaseUrl": "http://localhost:3000"
+    "imageServerBaseUrl": "http://localhost:3000",
+    "apiServerBaseUrl": "http://localhost:3000"
   },
   "test": {
     "hashSecret": "thisisasecretstring",
     "tokenSecret": "thisisasecretstring",
-    "imageServerBaseUrl": "http://localhost:3000"
+    "imageServerBaseUrl": "http://localhost:3000",
+    "apiServerBaseUrl": "http://localhost:3000"
+  },
+  "production": {
+    "hashSecret": "thisisasecretstring",
+    "tokenSecret": "thisisasecretstring",
+    "imageServerBaseUrl": "http://80.93.182.76:3000",
+    "apiServerBaseUrl": "http://80.93.182.76:3000"
   }
 }
