@@ -14,10 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
+    "username": "intour-backend-db",
+    "password": "kKNKJI9kxxXJbr7T",
     "database": "database_production",
-    "host": "127.0.0.1",
+    "host": "80.93.182.76",
     "dialect": "mysql"
   }
 }
