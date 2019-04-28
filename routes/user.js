@@ -294,7 +294,9 @@ router.post('/reservations', async (req, res) => {
         status: 0,
         errorMessage: '',
         total_cost: +totalCost.toFixed(2),
-        id: reservation.id
+        id: reservation.id,
+        // ToDo: Change after integration with payment gateway
+        payment_link: config['apiServerBaseUrl'] + `/user/reservations/${reservation.id}/process_payment?token=${req.query.token}`
       });
     } catch (err) {
       if (err && transaction) await transaction.rollback();
@@ -432,7 +434,70 @@ router.post('/reservations/:id/cancel', async (req, res) => {
       errorMessage: 'ID must be a number'
     });
   }
+});
 
+/*
+ * --------------------------------------------------
+ * Temporary code
+ * --------------------------------------------------
+ */
+
+router.get('/reservations/:id/payment_link', async (req, res) => {
+  const id = (typeof(+req.params.id) == 'number'
+    && +req.params.id >= 0) ? +req.params.id: false;
+
+  if (id) {
+    const reservation = (await req.user.user.Customer.getReservations({
+      where: {id}
+    }))[0];
+
+    if (!reservation) {
+      res.send({
+        status: -1,
+        errorMessage: 'Cannot find reservation'
+      });
+    }
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      payment_link: config['apiServerBaseUrl'] + `/user/reservations/${reservation.id}/process_payment?token=${req.query.token}`
+    });
+  } else {
+    res.send({
+      status: -1,
+      errorMessage: 'ID must be a number'
+    });
+  }
+});
+
+router.get('/reservations/:id/process_payment', async (req, res) => {
+  const id = (typeof(+req.params.id) == 'number'
+    && +req.params.id >= 0) ? +req.params.id: false;
+
+  if (id) {
+    const reservation = (await req.user.user.Customer.getReservations({
+      where: {id}
+    }))[0];
+
+    if (reservation.status !== 'new') {
+      res.send({
+        status: -1,
+        errorMessage: 'Cannot set paid status the excursion'
+      });
+    }
+
+    reservation.setDataValue('status', 'paid');
+
+    reservation.save();
+
+    res.send('<html><body>Payment status changed successfully</body></html>');
+  } else {
+    res.send({
+      status: -1,
+      errorMessage: 'ID must be a number'
+    });
+  }
 });
 
 module.exports = router;
