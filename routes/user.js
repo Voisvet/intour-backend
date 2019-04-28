@@ -390,10 +390,10 @@ router.get('/reservations/:id', async (req, res) => {
         description: reservation.Excursion.description,
         starting_point: reservation.Excursion.starting_point,
         date: +new Date(reservation.excursionDate),
-        total_cost: reservation.totalCost,
+        total_cost: +reservation.totalCost,
         status: reservation.status,
-        adult_tickets_amount: reservation.amountOfAdultTickets,
-        child_tickets_amount: reservation.amountOfChildTickets
+        adult_tickets_amount: +reservation.amountOfAdultTickets,
+        child_tickets_amount: +reservation.amountOfChildTickets
       }
     });
   } else {
