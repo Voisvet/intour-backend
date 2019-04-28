@@ -387,7 +387,7 @@ router.get('/reservations/:id', async (req, res) => {
         services: reservation.Excursion.services,
         description: reservation.Excursion.description,
         starting_point: reservation.Excursion.starting_point,
-        date: reservation.excursionDate,
+        date: +new Date(reservation.excursionDate),
         total_cost: reservation.totalCost,
         status: reservation.status,
         adult_tickets_amount: reservation.amountOfAdultTickets,
