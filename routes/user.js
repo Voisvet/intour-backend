@@ -245,7 +245,7 @@ router.post('/reservations', async (req, res) => {
     && req.body.child_tickets_amount >= 0) ? req.body.child_tickets_amount : false;
 
   // Check required fields
-  if (excursionId && date && amountOfAdultTickets && amountOfChildTickets) {
+  if (excursionId && date && typeof(amountOfAdultTickets) == 'number' && typeof(amountOfChildTickets) == 'number') {
     const parsedDate = new Date(date);
 
     // Check that excursion exists and takes place at specified time
