@@ -379,7 +379,7 @@ router.get('/reservations/:id', async (req, res) => {
       reservation: {
         id: reservation.id,
         title: reservation.Excursion.title,
-        images: reservation.Excursion.Images.map(image => image.link),
+        images: reservation.Excursion.Images.map(image => config['imageServerBaseUrl'] + image.link),
         start_time: reservation.excursionTime,
         end_time: `${endHours}:${endMinutes}:00`,
         duration: reservation.Excursion.duration,
