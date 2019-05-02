@@ -306,4 +306,31 @@ router.get('/agents', async (req, res) => {
   }
 });
 
+router.get('/agents/:id/report', async (req, res) => {
+  try {
+    const agent = await db.sequelize.model('Agent').findByPk(req.params.id);
+    const customers = await agent.getCustomers();
+    const reservations = [];
+    let temp, customer;
+
+    for (let i = 0; i < customers.length; i++) {
+      temp = await customers[i].getReservations();
+      reservations.push(...temp);
+    }
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      reservations
+    })
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+    });
+  }
+});
+
 module.exports = router;
