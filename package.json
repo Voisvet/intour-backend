@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "NODE_ENV=predprod node ./bin/www",
+    "start": "NODE_ENV=preprod node ./bin/www",
     "dev": "nodemon ./bin/www",
     "db:migrate": "node ./scripts/db/migrate",
     "db:migrate:preprod": "ENV=preprod node ./scripts/db/migrate"
