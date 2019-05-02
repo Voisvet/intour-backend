@@ -8,6 +8,7 @@ const fileUpload = require('express-fileupload');
 const publicRouter = require('./routes/public');
 const userRouter = require('./routes/user');
 const adminRouter = require('./routes/admin');
+const serviceRouter = require('./routes/service');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // Temporary solution, 
 
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
+app.use('/service', serviceRouter);
 app.use('/', publicRouter);
 
 // catch 404 and forward to error handler
