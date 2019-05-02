@@ -61,6 +61,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL'
+    },
+    paymentId: {
+      type: DataTypes.STRING
+    },
+    paymentStatus: {
+      type: DataTypes.ENUM('pending', 'waiting_for_capture', 'succeeded', 'canceled')
     }
   }, {});
   Reservetion.associate = function(models) {
