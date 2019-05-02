@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const jwtMiddleware = require('express-jwt');
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
@@ -288,6 +289,51 @@ router.post('/reservations', async (req, res) => {
 
       await req.user.user.Customer.addReservations(reservation, {transaction});
 
+      // Payment object for Yandex.Kassa
+      const payment = {
+        amount: {
+          value: reservation.totalCost,
+          currency: config.yk.currency
+        },
+        capture: true,
+        description: `Оплата заказа №${reservation.id}`,
+        metadata: {
+          reservationId: reservation.id
+        },
+        confirmation: {
+          type: 'redirect',
+          return_url: config['apiServerBaseUrl'] + `/user/reservations/${reservation.id}/process_payment?token=${req.query.token}`
+        }
+      };
+
+      // Create payment
+      const response = await axios.post(
+        config.yk.kassaApiUrl + '/payments',
+        payment,
+        {
+          auth: {
+            username: config.yk.shopId,
+            password: config.yk.secretKey
+          },
+          headers: {
+            'Idempotence-Key': reservation.id,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status !== 200) {
+        throw {
+          name: 'Could not create payment',
+          data: response
+        }
+      }
+
+      reservation.paymentId = response.data.id;
+      reservation.paymentStatus = response.data.status;
+      reservation.paymentLink = response.data.confirmation.confirmation_url;
+      await reservation.save({transaction});
+
       await transaction.commit();
 
       res.send({
@@ -295,11 +341,11 @@ router.post('/reservations', async (req, res) => {
         errorMessage: '',
         total_cost: +totalCost.toFixed(2),
         id: reservation.id,
-        // ToDo: Change after integration with payment gateway
-        payment_link: config['apiServerBaseUrl'] + `/user/reservations/${reservation.id}/process_payment?token=${req.query.token}`
+        payment_link: reservation.paymentLink
       });
     } catch (err) {
       if (err && transaction) await transaction.rollback();
+      console.error(err);
       res.status(500);
       res.send({
         status: -1,
@@ -461,7 +507,7 @@ router.get('/reservations/:id/payment_link', async (req, res) => {
     res.send({
       status: 0,
       errorMessage: '',
-      payment_link: config['apiServerBaseUrl'] + `/user/reservations/${reservation.id}/process_payment?token=${req.query.token}`
+      payment_link: reservation.paymentLink
     });
   } else {
     res.send({

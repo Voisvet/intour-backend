@@ -7,7 +7,8 @@
     "yk": {
       "shopId": "602481",
       "secretKey": "test_BLYs7p8FC9ElUamQwuR50grA4ac00lf22mx6V5OoDYU",
-      "kassaApiUrl": "https://payment.yandex.net/api/v3"
+      "kassaApiUrl": "https://payment.yandex.net/api/v3",
+      "currency": "RUB"
     }
   },
   "test": {
@@ -18,7 +19,8 @@
     "yk": {
       "shopId": "602481",
       "secretKey": "test_BLYs7p8FC9ElUamQwuR50grA4ac00lf22mx6V5OoDYU",
-      "kassaApiUrl": "https://payment.yandex.net/api/v3"
+      "kassaApiUrl": "https://payment.yandex.net/api/v3",
+      "currency": "RUB"
     }
   },
   "preprod": {
@@ -29,7 +31,8 @@
     "yk": {
       "shopId": "602481",
       "secretKey": "test_BLYs7p8FC9ElUamQwuR50grA4ac00lf22mx6V5OoDYU",
-      "kassaApiUrl": "https://payment.yandex.net/api/v3"
+      "kassaApiUrl": "https://payment.yandex.net/api/v3",
+      "currency": "RUB"
     }
   },
   "production": {
@@ -40,7 +43,8 @@
     "yk": {
       "shopId": "",
       "secretKey": "",
-      "kassaApiUrl": "https://payment.yandex.net/api/v3"
+      "kassaApiUrl": "https://payment.yandex.net/api/v3",
+      "currency": "RUB"
     }
   }
 }
