@@ -137,39 +137,3 @@ async function fillInData() {
 }
 
 fillInData().catch(err => log);
-
-
-// Promise.all([
-//   ExcursionImage.create({link: 'https://404store.com/2017/10/01/246394.jpg'}),
-//   ExcursionImage.create({link: 'https://img2.goodfon.ru/original/1920x1200/6/60/birshtadt-peyzazh-gory-vodopad.jpg'})
-// ])
-//   .then((images) => {
-//     storage.images = images;
-//     return Promise.all([
-//       ExcursionSchedule.create({weekDay: 'mon', time: '08:00:00'}),
-//       ExcursionSchedule.create({weekDay: 'sat', time: '12:00:00'})
-//     ]);
-//   })
-//   .then(schedules => {
-//     storage.schedules = schedules;
-//     return Excursion.create({
-//       title: 'Test Excursion',
-//       duration: 30,
-//       type: 'BUS',
-//       services: ['SERV1', 'SERV2'],
-//       description: 'This is a test excursion. Don\'t try to give it some meaning.',
-//       starting_point: 'U cherta na kulichikah',
-//       adult_ticket_cost: 12.5,
-//       child_ticket_cost: 10.0,
-//       region: 'test region'
-//     });
-//   })
-//   .then(excursion => {
-//     return Promise.all([
-//       excursion.setImages(storage.images),
-//       excursion.setSchedule(storage.schedules)
-//     ]);
-//   })
-//   .then(() => {
-//     console.log('Success');
-//   });

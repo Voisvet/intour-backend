@@ -13,6 +13,13 @@
     "host": "80.93.182.76",
     "dialect": "mysql"
   },
+  "preprod": {
+    "username": "intour-backend-db",
+    "password": "kKNKJI9kxxXJbr7T",
+    "database": "intour-backend-preprod-db",
+    "host": "80.93.182.76",
+    "dialect": "mysql"
+  },
   "production": {
     "username": "intour-backend-db",
     "password": "kKNKJI9kxxXJbr7T",
