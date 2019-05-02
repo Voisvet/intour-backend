@@ -9,6 +9,7 @@
     "db:migrate:preprod": "ENV=preprod node ./scripts/db/migrate"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
