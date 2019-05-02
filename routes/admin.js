@@ -425,7 +425,7 @@ router.get('/operators/:id/report', async (req, res) => {
   }
 });
 
-router.post('/clients', validators.validatorsClient, async (req, res) => {
+router.post('/clients', validators.client, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.send({
@@ -508,6 +508,73 @@ router.post('/clients', validators.validatorsClient, async (req, res) => {
       errorMessage: 'Something went wrong when storing data to DB'
     });
   }
+});
+
+router.post('/operators', validators.agentAndOperator, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.send({
+      status: -1,
+      errorMessage: 'Обнаружены ошибки при вводе данных',
+      errors: errors.array()
+    });
+    return;
+  }
+
+  let transaction;
+
+  try {
+    transaction = await db.sequelize.transaction();
+
+    // Create new operator
+    const operator = await db.sequelize.model('ExcursionOperator').create({
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email
+    }, {transaction});
+
+    // Check if we have user with the same login in DB
+    let user = await db.sequelize.model('User').findOne({
+      where: {
+        login: req.body.email
+      }
+    });
+
+    if (user) {
+      res.send({
+        status: -1,
+        errorMessage: 'This email is already used'
+      });
+      await transaction.rollback();
+      return;
+    }
+
+    // Create new user
+    user = await db.sequelize.model('User').create({
+      login: req.body.email,
+      passwordHash: helpers.hash(req.body.password),
+      accountType: 'operator'
+    }, {transaction});
+
+    // Associate new user with a customer
+    await user.setExcursionOperator(operator, {transaction});
+
+    await transaction.commit();
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      id: operator.id
+    });
+  } catch (err) {
+    if (err && transaction) await transaction.rollback();
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB'
+    });
+  }
+
 });
 
 module.exports = router;
