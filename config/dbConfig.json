@@ -4,27 +4,31 @@
     "password": "kKNKJI9kxxXJbr7T",
     "database": "intour-backend-db",
     "host": "80.93.182.76",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "test": {
     "username": "intour-backend-db",
     "password": "kKNKJI9kxxXJbr7T",
     "database": "intour-backend-test-db",
     "host": "80.93.182.76",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "preprod": {
     "username": "intour-backend-db",
     "password": "kKNKJI9kxxXJbr7T",
     "database": "intour-backend-preprod-db",
     "host": "80.93.182.76",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "production": {
     "username": "intour-backend-db",
     "password": "kKNKJI9kxxXJbr7T",
     "database": "intour-backend-db",
     "host": "80.93.182.76",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   }
 }
