@@ -372,4 +372,23 @@ router.get('/operators', async (req, res) => {
   }
 });
 
+router.get('/clients', async (req, res) => {
+  try {
+    const customers = await db.sequelize.model('Customer').findAll();
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      clients: customers
+    })
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+    });
+  }
+});
+
 module.exports = router;
