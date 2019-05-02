@@ -353,4 +353,23 @@ router.get('/agents/:id/clients', async (req, res) => {
   }
 });
 
+router.get('/operators', async (req, res) => {
+  try {
+    const operators = await db.sequelize.model('ExcursionOperator').findAll();
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      operators
+    })
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+    });
+  }
+});
+
 module.exports = router;
