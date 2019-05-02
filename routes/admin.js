@@ -287,4 +287,23 @@ router.get('/reservations', async (req, res) => {
   }
 });
 
+router.get('/agents', async (req, res) => {
+  try {
+    const agents = await db.sequelize.model('Agent').findAll();
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      agents
+    })
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+    });
+  }
+});
+
 module.exports = router;
