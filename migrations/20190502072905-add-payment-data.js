@@ -16,6 +16,13 @@ module.exports = {
         {
           type: Sequelize.ENUM('pending', 'waiting_for_capture', 'succeeded', 'canceled')
         }
+      ),
+      queryInterface.addColumn(
+        'Reservations',
+        'paymentLink',
+        {
+          type: Sequelize.STRING
+        }
       )
     ]);
   },
@@ -29,6 +36,10 @@ module.exports = {
       queryInterface.removeColumn(
         'Reservations',
         'paymentStatus'
+      ),
+      queryInterface.removeColumn(
+        'Reservations',
+        'paymentLink'
       )
     ]);
   }

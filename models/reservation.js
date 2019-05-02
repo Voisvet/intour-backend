@@ -65,6 +65,9 @@ module.exports = (sequelize, DataTypes) => {
     paymentId: {
       type: DataTypes.STRING
     },
+    paymentLink: {
+      type: DataTypes.STRING
+    },
     paymentStatus: {
       type: DataTypes.ENUM('pending', 'waiting_for_capture', 'succeeded', 'canceled')
     }
