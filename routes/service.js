@@ -19,11 +19,11 @@ router.post('/yk_notification', async (req, res) => {
     req.body.type : false;
   const paymentId = typeof(req.body.object.id) == 'string' && req.body.object.id.length > 0 ?
     req.body.object.id : false;
-  const paymentStatus = typeof(req.body.object.status) == 'string' && req.body.object.status > 0 ?
-    req.body.object.status : false;
-  const reservationId = typeof(req.body.object.metadata.reservationId) == 'number'
-    && req.body.object.metadata.reservationId > 0 ?
-    req.body.object.metadata.reservationId : false;
+  const paymentStatus = typeof(req.body.object.status) == 'string'
+    && req.body.object.status.length > 0 ? req.body.object.status : false;
+  const reservationId = typeof(req.body.object.metadata.reservationId) == 'string'
+    && +req.body.object.metadata.reservationId > 0 ?
+    +req.body.object.metadata.reservationId : false;
 
   console.log('type', type);
   console.log('paymentId', paymentId);
