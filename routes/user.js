@@ -373,16 +373,18 @@ router.get('/reservations', async (req, res) => {
     errorMessage: '',
     reservations: reservations.map(reservation => {
       const splittedTime = reservation.excursionTime.split(":");
-      const endHours = (+splittedTime[0] + Math.floor(reservation.Excursion.duration / 60)) % 24;
-      const endMinutes = +splittedTime[1] + reservation.Excursion.duration % 60;
+      const totalTime = +splittedTime[0] * 60 + +splittedTime[1] + reservation.Excursion.duration;
+
+      const endHours = Math.floor(totalTime / 60);
+      const endMinutes = totalTime % 60;
 
       return {
         id: reservation.id,
         title: reservation.Excursion.title,
         total_cost: +reservation.totalCost,
         date: +new Date(reservation.excursionDate),
-        start_time: reservation.excursionTime,
-        end_time: `${endHours}:${endMinutes}:00`,
+        start_time: `${splittedTime[0]}:${splittedTime[1]}`,
+        end_time: `${endHours < 10 ? '0' + endHours : endHours}:${endMinutes < 10 ? '0' + endMinutes : endMinutes}`,
         status: reservation.status,
         adult_tickets_amount: reservation.amountOfAdultTickets,
         child_tickets_amount: reservation.amountOfChildTickets
