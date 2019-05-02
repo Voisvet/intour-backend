@@ -146,7 +146,7 @@ router.get('/regions', async (req, res) => {
   }
 });
 
-router.get('/token', validators.login, async (req, res) => {
+router.get('/token', req => console.log(req.query), validators.login, async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
