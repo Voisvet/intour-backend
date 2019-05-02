@@ -333,4 +333,24 @@ router.get('/agents/:id/report', async (req, res) => {
   }
 });
 
+router.get('/agents/:id/clients', async (req, res) => {
+  try {
+    const agent = await db.sequelize.model('Agent').findByPk(req.params.id);
+    const customers = await agent.getCustomers();
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      clients: customers
+    })
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+    });
+  }
+});
+
 module.exports = router;
