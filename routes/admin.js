@@ -311,8 +311,9 @@ router.get('/agents/:id/report', async (req, res) => {
     const agent = await db.sequelize.model('Agent').findByPk(req.params.id);
     const customers = await agent.getCustomers();
     const reservations = [];
-    let temp, customer;
+    let temp;
 
+    // Can be optimised using promise.all...
     for (let i = 0; i < customers.length; i++) {
       temp = await customers[i].getReservations();
       reservations.push(...temp);
@@ -380,6 +381,37 @@ router.get('/clients', async (req, res) => {
       status: 0,
       errorMessage: '',
       clients: customers
+    })
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+    });
+  }
+});
+
+router.get('/operators/:id/report', async (req, res) => {
+  try {
+    const operator = await db.sequelize.model('ExcursionOperator').findByPk(req.params.id);
+    const excursions = await operator.getExcursions();
+
+    const reservations = [];
+    let temp;
+
+    // Can be optimised using promise.all...
+    for (let i = 0; i < excursions.length; i++) {
+      temp = await db.sequelize
+        .model('Reservation')
+        .findAll({where: {excursionId: excursions[i].id}});
+      reservations.push(...temp);
+    }
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      reservations
     })
   } catch (err) {
     console.error(err);
