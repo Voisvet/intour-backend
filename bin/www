@@ -4,20 +4,34 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('intour-backend:server');
-var http = require('http');
-var models = require('../models');
+const app = require('../app');
+const debug = require('debug')('intour-backend:server');
+const http = require('http');
+const https = require('https');
+const path = require('path');
+const fs = require('fs');
+const process = require('process');
+const models = require('../models');
+
+const env = process.env.NODE_ENV || 'development';
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+const httpPort = normalizePort(process.env.PORT || '3000');
+app.set('httpPort', httpPort);
 
-var server = http.createServer(app);
+const httpServer = http.createServer(app);
 
+
+const httpsPort = normalizePort(process.env.HTTPS_PORT || '3001');
+app.set('httpsPort', httpsPort);
+
+const httpsServer = https.createServer({
+  key: fs.readFileSync(path.join(process.cwd(), 'config/certs', env, 'server.key')),
+  cert: fs.readFileSync(path.join(process.cwd(), 'config/certs', env, 'server.cert'))
+}, app);
 /**
  * Create HTTP server.
  */
@@ -28,11 +42,17 @@ models.sequelize.sync().then(function () {
    * Listen on provided port, on all network interfaces.
    */
 
-  server.listen(port, function () {
-    console.log('Express server is listening on port ' + server.address().port);
+  httpServer.listen(httpPort, function () {
+    console.log('Express server is listening on port ' + httpServer.address().port);
   });
-  server.on('error', onError);
-  server.on('listening', onListening);
+  httpServer.on('error', onError);
+  httpServer.on('listening', onListening);
+
+  httpsServer.listen(httpsPort, function () {
+    console.log('Express HTTPS server is listening on port ' + httpsServer.address().port);
+  });
+  httpsServer.on('error', onError);
+  httpsServer.on('listening', onListening);
 });
 
 /**
@@ -40,7 +60,7 @@ models.sequelize.sync().then(function () {
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -64,9 +84,9 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  const bind = typeof httpPort === 'string'
+    ? 'Pipe ' + httpPort
+    : 'Port ' + httpPort;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -88,8 +108,8 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
+  const addr = httpServer.address();
+  const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
