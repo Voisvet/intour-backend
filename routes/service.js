@@ -25,6 +25,11 @@ router.post('/yk_notification', async (req, res) => {
     && req.body.object.metadata.reservationId > 0 ?
     req.body.object.metadata.reservationId : false;
 
+  console.log('type', type);
+  console.log('paymentId', paymentId);
+  console.log('paymentStatus', paymentStatus);
+  console.log('reservationId', reservationId);
+
 
   if (reservationId && type && paymentId && paymentStatus &&
       typeof(req.body.object.paid) =='boolean') {
