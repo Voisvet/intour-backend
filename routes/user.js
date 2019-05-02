@@ -32,7 +32,7 @@ router.post('/new', validators.client, async (req, res) => {
 
     let agent = null;
     // Get agent if it is specified
-    if (typeof(req.body.agent_id) == 'number') {
+    if (req.body.agent_id) {
       agent = await db.sequelize.model('Agent')
         .findByPk(req.body.agent_id, {transaction});
       if (!agent) {
