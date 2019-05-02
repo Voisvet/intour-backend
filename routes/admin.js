@@ -1,5 +1,7 @@
 const db = require('../models');
 const helpers = require('../lib/helpers');
+const validators = require('../lib/validators');
+const { validationResult } = require('express-validator/check');
 const jwt = require('jsonwebtoken');
 const jwtMiddleware = require('express-jwt');
 const express = require('express');
@@ -419,6 +421,91 @@ router.get('/operators/:id/report', async (req, res) => {
     res.send({
       status: -1,
       errorMessage: 'Something went wrong when storing data to DB. Try again later.'
+    });
+  }
+});
+
+router.post('/clients', validators.validatorsClient, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.send({
+      status: -1,
+      errorMessage: 'Обнаружены ошибки при вводе данных',
+      errors: errors.array()
+    });
+    return;
+  }
+
+
+  let transaction;
+
+  try {
+    transaction = await db.sequelize.transaction();
+
+    let agent = null;
+    // Get agent if it is specified
+    if (typeof(req.body.agent_id) == 'number') {
+      agent = await db.sequelize.model('Agent')
+        .findByPk(req.body.agent_id, {transaction});
+      if (!agent) {
+        res.send({
+          status: -1,
+          errorMessage: 'Agent with specified ID is not found'
+        });
+        await transaction.rollback();
+        return;
+      }
+    }
+
+    // Create new customer
+    const customer = await db.sequelize.model('Customer').create({
+      firstName: req.body.first_name,
+      lastName: req.body.last_name,
+      phone: req.body.phone
+    }, {transaction});
+
+    // Add new customer to agent's list of customers
+    if (agent) await agent.addCustomers(customer, {transaction});
+
+    // Check if we have user with the same login in DB
+    let user = await db.sequelize.model('User').findOne({
+      where: {
+        login: req.body.phone
+      }
+    });
+
+    if (user) {
+      res.send({
+        status: -1,
+        errorMessage: 'This phone number is already used'
+      });
+      await transaction.rollback();
+      return;
+    }
+
+    // Create new user
+    user = await db.sequelize.model('User').create({
+      login: req.body.phone,
+      passwordHash: helpers.hash(req.body.password),
+      accountType: 'customer'
+    }, {transaction});
+
+    // Associate new user with a customer
+    await user.setCustomer(customer, {transaction});
+
+    await transaction.commit();
+
+    res.send({
+      status: 0,
+      errorMessage: '',
+      id: customer.id
+    });
+  } catch (err) {
+    if (err && transaction) await transaction.rollback();
+    res.status(500);
+    res.send({
+      status: -1,
+      errorMessage: 'Something went wrong when storing data to DB'
     });
   }
 });
