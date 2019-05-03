@@ -17,10 +17,9 @@ router.post('/new', validators.client, async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -36,10 +35,7 @@ router.post('/new', validators.client, async (req, res) => {
       agent = await db.sequelize.model('Agent')
         .findByPk(req.body.agent_id, {transaction});
       if (!agent) {
-        res.send({
-          status: -1,
-          errorMessage: 'Agent with specified ID is not found'
-        });
+        res.status(400).send({errorMessage: 'Agent with specified ID is not found'});
         await transaction.rollback();
         return;
       }
@@ -63,10 +59,7 @@ router.post('/new', validators.client, async (req, res) => {
     });
 
     if (user) {
-      res.send({
-        status: -1,
-        errorMessage: 'This phone number is already used'
-      });
+      res.status(400).send({errorMessage: 'This phone number is already used'});
       await transaction.rollback();
       return;
     }
@@ -96,11 +89,7 @@ router.post('/new', validators.client, async (req, res) => {
     });
   } catch (err) {
     if (err && transaction) await transaction.rollback();
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB'});
   }
 });
 
@@ -139,10 +128,7 @@ router.get('/regions', async (req, res) => {
       regions
     })
   } catch (err) {
-    res.status(500).send({
-      status: -1,
-      errorMessage: 'Database is not available now. Try again later.'
-    })
+    res.status(500).send({errorMessage: 'Database is not available now. Try again later.'});
   }
 });
 
@@ -150,10 +136,9 @@ router.get('/token', validators.login, async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -177,10 +162,7 @@ router.get('/token', validators.login, async (req, res) => {
       })
     });
   } else {
-    res.send({
-      status: -1,
-      errorMessage: 'Login not found or wrong password'
-    })
+    res.status(400).send({errorMessage: 'Login not found or wrong password'});
   }
 });
 
@@ -197,11 +179,7 @@ router.use(jwtMiddleware({
 // Check account type and start extract user from database
 router.use(async(req, res, next) => {
   if (req.user.accountType !== 'customer') {
-    res.status(401);
-    res.send({
-      status: -1,
-      errorMessage: 'This user cannot use the app'
-    });
+    res.status(403).send({errorMessage: 'This user cannot use the app'});
     return;
   }
 
@@ -217,11 +195,7 @@ router.use(async(req, res, next) => {
     });
 
   if (!req.user.user) {
-    res.status(401);
-    res.send({
-      status: -1,
-      errorMessage: 'Your account doesn\'t exist'
-    });
+    res.status(401).send({errorMessage: 'Your account doesn\'t exist'});
     return;
   }
 
@@ -233,10 +207,9 @@ router.post('/reservations', validators.reservation, async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -256,10 +229,7 @@ router.post('/reservations', validators.reservation, async (req, res) => {
   });
 
   if (!excursion) {
-    res.send({
-      status: -1,
-      errorMessage: 'Specified excursion doesn\'t exist or take place at that day and time'
-    });
+    res.stat(400).send({errorMessage: 'Specified excursion doesn\'t exist or take place at that day and time'});
     return;
   }
 
@@ -340,11 +310,7 @@ router.post('/reservations', validators.reservation, async (req, res) => {
   } catch (err) {
     if (err && transaction) await transaction.rollback();
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
@@ -385,10 +351,9 @@ router.get('/reservations/:id', validators.id, async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.stat(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -406,11 +371,7 @@ router.get('/reservations/:id', validators.id, async (req, res) => {
   }))[0];
 
   if(!reservation) {
-    res.status(404);
-    res.send({
-      status: -1,
-      errorMessage: 'Reservation not found'
-    });
+    res.status(404).send({errorMessage: 'Reservation not found'});
     return;
   }
 
@@ -445,10 +406,9 @@ router.post('/reservations/:id/cancel', validators.id, async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -457,10 +417,7 @@ router.post('/reservations/:id/cancel', validators.id, async (req, res) => {
   }))[0];
 
   if (reservation.status !== 'new') {
-    res.send({
-      status: -1,
-      errorMessage: 'Cannot cancel the excursion'
-    });
+    res.status(400).send({errorMessage: 'Cannot cancel the excursion'});
   }
 
   reservation.setDataValue('status', 'cancelled');
@@ -482,8 +439,7 @@ router.post('/reservations/:id/cancel', validators.id, async (req, res) => {
 router.get('/reservations/:id/payment_link', validators.id, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
       errors: errors.array()
     });
@@ -494,10 +450,7 @@ router.get('/reservations/:id/payment_link', validators.id, async (req, res) => 
   }))[0];
 
   if (!reservation) {
-    res.send({
-      status: -1,
-      errorMessage: 'Cannot find reservation'
-    });
+    res.status(404).send({errorMessage: 'Cannot find reservation'});
   }
 
   res.send({

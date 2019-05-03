@@ -42,16 +42,10 @@ router.get('/token', async (req, res) => {
         })
       });
     } else {
-      res.send({
-        status: -1,
-        errorMessage: 'Login not found or wrong password'
-      })
+      res.status(400).send({errorMessage: 'Login not found or wrong password'});
     }
   } else {
-    res.send({
-      status: -1,
-      errorMessage: 'Missing login or password'
-    });
+    res.status(400).send({errorMessage: 'Missing login or password'});
   }
 });
 
@@ -68,11 +62,7 @@ router.use(jwtMiddleware({
 // Check account type and start extract user from database
 router.use(async (req, res, next) => {
   if (!['agent', 'operator', 'admin'].includes(req.user.accountType)) {
-    res.status(401);
-    res.send({
-      status: -1,
-      errorMessage: 'This user cannot use the app'
-    });
+    res.status(403).send({errorMessage: 'This user cannot use the app'});
     return;
   }
 
@@ -91,11 +81,7 @@ router.use(async (req, res, next) => {
     });
 
   if (!req.user.user) {
-    res.status(401);
-    res.send({
-      status: -1,
-      errorMessage: 'Your account doesn\'t exist'
-    });
+    res.status(401).send({errorMessage: 'Your account doesn\'t exist'});
     return;
   }
 
@@ -171,19 +157,13 @@ router.post('/excursions', async function (req, res, next) {
 
   if (!(type && title && description && startingPoint && cityId && duration
         && adultTicketCost && childTicketCost && services && images && schedules)) {
-    res.send({
-      status: -1,
-      errorMessage: 'Missing required fields'
-    });
+    res.status(400).send({errorMessage: 'Missing required fields'});
     return;
   }
 
   const city = await db.sequelize.model('City').findByPk(cityId);
   if (!city) {
-    res.send({
-      status: -1,
-      errorMessage: 'Specified city does not exist'
-    });
+    res.status(400).send({errorMessage: 'Specified city does not exist'});
     return;
   }
 
@@ -191,10 +171,7 @@ router.post('/excursions', async function (req, res, next) {
   if (operatorId) {
     operator = await db.sequelize.model('ExcursionOperator').findByPk(operatorId);
     if (!operator) {
-      res.send({
-        status: -1,
-        errorMessage: 'Specified operator does not exist'
-      });
+      res.status(400).send({errorMessage: 'Specified operator does not exist'});
       return;
     }
   }
@@ -238,10 +215,7 @@ router.post('/excursions', async function (req, res, next) {
     });
   } catch (err) {
     if (err && transaction) await transaction.rollback();
-    res.status(500).send({
-      status: -1,
-      errorMessage: 'Something went wrong... Try again later or contact administrator'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong... Try again later or contact administrator'});
   }
 });
 
@@ -263,10 +237,7 @@ router.post('/image', function(req, res, next) {
       },
     );
   } else {
-    res.send({
-      status: -1,
-      errorMessage: 'Image is not defined in your request'
-    });
+    res.status(400).send({errorMessage: 'Image is not defined in your request'});
   }
 });
 
@@ -281,11 +252,7 @@ router.get('/reservations', async (req, res) => {
     })
   } catch (err) {
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
@@ -300,11 +267,7 @@ router.get('/agents', async (req, res) => {
     })
   } catch (err) {
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
@@ -328,11 +291,7 @@ router.get('/agents/:id/report', async (req, res) => {
     })
   } catch (err) {
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
@@ -348,11 +307,7 @@ router.get('/agents/:id/clients', async (req, res) => {
     })
   } catch (err) {
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
@@ -367,11 +322,7 @@ router.get('/operators', async (req, res) => {
     })
   } catch (err) {
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
@@ -386,11 +337,7 @@ router.get('/clients', async (req, res) => {
     })
   } catch (err) {
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
@@ -417,21 +364,16 @@ router.get('/operators/:id/report', async (req, res) => {
     })
   } catch (err) {
     console.error(err);
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB. Try again later.'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB. Try again later.'});
   }
 });
 
 router.post('/clients', validators.client, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -448,10 +390,7 @@ router.post('/clients', validators.client, async (req, res) => {
       agent = await db.sequelize.model('Agent')
         .findByPk(req.body.agent_id, {transaction});
       if (!agent) {
-        res.send({
-          status: -1,
-          errorMessage: 'Agent with specified ID is not found'
-        });
+        res.status(400).send({errorMessage: 'Agent with specified ID is not found'});
         await transaction.rollback();
         return;
       }
@@ -475,10 +414,7 @@ router.post('/clients', validators.client, async (req, res) => {
     });
 
     if (user) {
-      res.send({
-        status: -1,
-        errorMessage: 'This phone number is already used'
-      });
+      res.status(400).send({errorMessage: 'This phone number is already used'});
       await transaction.rollback();
       return;
     }
@@ -502,21 +438,16 @@ router.post('/clients', validators.client, async (req, res) => {
     });
   } catch (err) {
     if (err && transaction) await transaction.rollback();
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB'});
   }
 });
 
 router.post('/operators', validators.agentAndOperator, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -541,10 +472,7 @@ router.post('/operators', validators.agentAndOperator, async (req, res) => {
     });
 
     if (user) {
-      res.send({
-        status: -1,
-        errorMessage: 'This email is already used'
-      });
+      res.status(400).send({errorMessage: 'This email is already used'});
       await transaction.rollback();
       return;
     }
@@ -568,11 +496,7 @@ router.post('/operators', validators.agentAndOperator, async (req, res) => {
     });
   } catch (err) {
     if (err && transaction) await transaction.rollback();
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB'});
   }
 
 });
@@ -580,10 +504,9 @@ router.post('/operators', validators.agentAndOperator, async (req, res) => {
 router.post('/agents', validators.agentAndOperator, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.send({
-      status: -1,
+    res.status(400).send({
       errorMessage: 'Обнаружены ошибки при вводе данных',
-      errors: errors.array()
+      validationErrors: errors.array()
     });
     return;
   }
@@ -608,10 +531,7 @@ router.post('/agents', validators.agentAndOperator, async (req, res) => {
     });
 
     if (user) {
-      res.send({
-        status: -1,
-        errorMessage: 'This email is already used'
-      });
+      res.status(400).send({errorMessage: 'This email is already used'});
       await transaction.rollback();
       return;
     }
@@ -635,11 +555,7 @@ router.post('/agents', validators.agentAndOperator, async (req, res) => {
     });
   } catch (err) {
     if (err && transaction) await transaction.rollback();
-    res.status(500);
-    res.send({
-      status: -1,
-      errorMessage: 'Something went wrong when storing data to DB'
-    });
+    res.status(500).send({errorMessage: 'Something went wrong when storing data to DB'});
   }
 
 });
