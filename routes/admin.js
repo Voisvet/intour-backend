@@ -30,8 +30,6 @@ router.get('/token', async (req, res) => {
 
     if (user && ['agent', 'operator', 'admin'].includes(user.accountType)) {
       res.send({
-        status: 0,
-        errorMessage: '',
         token: jwt.sign({
           userId: user.id,
           operatorId: user.operatorId,
@@ -122,9 +120,7 @@ router.get('/excursions', function (req, res, next) {
       });
 
       res.send({
-        excursions,
-        status: 0,
-        errorMessage: ''
+        excursions
       });
     });
 });
@@ -209,9 +205,7 @@ router.post('/excursions', async function (req, res, next) {
     await transaction.commit();
 
     res.send({
-      id: excursionInstance.id,
-      status: 0,
-      errorMessage: ''
+      id: excursionInstance.id
     });
   } catch (err) {
     if (err && transaction) await transaction.rollback();
@@ -246,8 +240,6 @@ router.get('/reservations', async (req, res) => {
     const reservations = await db.sequelize.model('Reservation').findAll();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       reservations
     })
   } catch (err) {
@@ -261,8 +253,6 @@ router.get('/agents', async (req, res) => {
     const agents = await db.sequelize.model('Agent').findAll();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       agents
     })
   } catch (err) {
@@ -285,8 +275,6 @@ router.get('/agents/:id/report', async (req, res) => {
     }
 
     res.send({
-      status: 0,
-      errorMessage: '',
       reservations
     })
   } catch (err) {
@@ -301,8 +289,6 @@ router.get('/agents/:id/clients', async (req, res) => {
     const customers = await agent.getCustomers();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       clients: customers
     })
   } catch (err) {
@@ -316,8 +302,6 @@ router.get('/operators', async (req, res) => {
     const operators = await db.sequelize.model('ExcursionOperator').findAll();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       operators
     })
   } catch (err) {
@@ -331,8 +315,6 @@ router.get('/clients', async (req, res) => {
     const customers = await db.sequelize.model('Customer').findAll();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       clients: customers
     })
   } catch (err) {
@@ -358,8 +340,6 @@ router.get('/operators/:id/report', async (req, res) => {
     }
 
     res.send({
-      status: 0,
-      errorMessage: '',
       reservations
     })
   } catch (err) {
@@ -432,8 +412,6 @@ router.post('/clients', validators.client, async (req, res) => {
     await transaction.commit();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       id: customer.id
     });
   } catch (err) {
@@ -490,8 +468,6 @@ router.post('/operators', validators.agentAndOperator, async (req, res) => {
     await transaction.commit();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       id: operator.id
     });
   } catch (err) {
@@ -549,8 +525,6 @@ router.post('/agents', validators.agentAndOperator, async (req, res) => {
     await transaction.commit();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       id: agent.id
     });
   } catch (err) {

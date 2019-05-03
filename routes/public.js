@@ -38,9 +38,7 @@ router.get('/excursions', function(req, res, next) {
         };
       });
       res.send({
-        excursions,
-        status: 0,
-        errorMessage: ''
+        excursions
       });
     });
 });
@@ -86,8 +84,6 @@ router.get('/excursions/:id', function(req, res, next) {
       });
 
       res.send({
-        status: 0,
-        errorMessage: '',
         excursion: {
           id: excursion.id,
           images: excursion.Images.map(image => config['imageServerBaseUrl'] + image.link),

@@ -77,8 +77,6 @@ router.post('/new', validators.client, async (req, res) => {
     await transaction.commit();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       token: jwt.sign({
         userId: user.id,
         customerId: customer.id,
@@ -123,8 +121,6 @@ router.get('/regions', async (req, res) => {
     }));
 
     res.send({
-      status: 0,
-      errorMessage: '',
       regions
     })
   } catch (err) {
@@ -151,8 +147,6 @@ router.get('/token', validators.login, async (req, res) => {
 
   if (user && user.accountType === 'customer') {
     res.send({
-      status: 0,
-      errorMessage: '',
       token: jwt.sign({
         userId: user.id,
         customerId: user.customerId,
@@ -301,8 +295,6 @@ router.post('/reservations', validators.reservation, async (req, res) => {
     await transaction.commit();
 
     res.send({
-      status: 0,
-      errorMessage: '',
       total_cost: +totalCost.toFixed(2),
       id: reservation.id,
       payment_link: reservation.paymentLink
@@ -323,8 +315,6 @@ router.get('/reservations', async (req, res) => {
   });
 
   res.send({
-    status: 0,
-    errorMessage: '',
     reservations: reservations.map(reservation => {
       const splittedTime = reservation.excursionTime.split(":");
       const totalTime = +splittedTime[0] * 60 + +splittedTime[1] + reservation.Excursion.duration;
@@ -380,8 +370,6 @@ router.get('/reservations/:id', validators.id, async (req, res) => {
   const endMinutes = +splittedTime[1] + reservation.Excursion.duration % 60;
 
   res.send({
-    status: 0,
-    errorMessage: '',
     reservation: {
       id: reservation.id,
       title: reservation.Excursion.title,
@@ -424,10 +412,7 @@ router.post('/reservations/:id/cancel', validators.id, async (req, res) => {
 
   reservation.save();
 
-  res.send({
-    status: 0,
-    errorMessage: ''
-  });
+  res.send({});
 });
 
 /*
@@ -454,8 +439,6 @@ router.get('/reservations/:id/payment_link', validators.id, async (req, res) => 
   }
 
   res.send({
-    status: 0,
-    errorMessage: '',
     payment_link: reservation.paymentLink
   });
 });
