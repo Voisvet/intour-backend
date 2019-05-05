@@ -232,7 +232,15 @@ router.post('/reservations', validators.reservation, async (req, res) => {
   });
 
   if (!excursion) {
-    res.stat(400).send({errorMessage: 'Specified excursion doesn\'t exist or take place at that day and time'});
+    res.status(400).send({errorMessage: 'Specified excursion doesn\'t exist or take place at that day and time'});
+    return;
+  }
+
+  // Check that the hotel exists and placed in the same city as excursion
+  const hotel = await db.sequelize.model("Hotel").findByPk(req.body.hotel_id);
+
+  if (!hotel || hotel.cityId !== excursion.cityId) {
+    res.status(400).send({errorMessage: 'Specified hotel doesn\'t exist or is placed in other city'});
     return;
   }
 
@@ -249,7 +257,8 @@ router.post('/reservations', validators.reservation, async (req, res) => {
       excursionTime: `${parsedDate.getHours()}:${parsedDate.getMinutes()}:00`,
       amountOfAdultTickets: req.body.adult_tickets_amount,
       amountOfChildTickets: req.body.child_tickets_amount,
-      totalCost: totalCost
+      totalCost: totalCost,
+      hotelId: hotel.id
     }, {transaction});
 
     await reservation.setExcursion(excursion, {transaction});
