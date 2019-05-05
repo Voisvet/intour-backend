@@ -249,7 +249,7 @@ router.get('/reservations', async (req, res) => {
     const reservations = await db.sequelize.model('Reservation').findAll();
 
     res.send({
-      reservations
+      reservations: reservations.reverse()
     })
   } catch (err) {
     console.error(err);
