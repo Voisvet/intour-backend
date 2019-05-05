@@ -22,6 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'cityId',
       sourceKey: 'id'
     });
+    City.hasMany(models.Hotel, {
+      as: 'Hotels',
+      foreignKey: 'cityId',
+      sourceKey: 'id'
+    });
   };
   return City;
 };

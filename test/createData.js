@@ -5,6 +5,7 @@ ExcursionImage = db.sequelize.model('ExcursionImage');
 ExcursionSchedule = db.sequelize.model('ExcursionSchedule');
 Country = db.sequelize.model('Country');
 City = db.sequelize.model('City');
+Hotel = db.sequelize.model('Hotel');
 
 storage = {};
 
@@ -16,11 +17,24 @@ async function fillInData() {
 
     const greece = await Country.create({name: 'Греция'}, {transaction});
     const city = await City.create({name: 'Ираклион', countryId: greece.id}, {transaction});
-    const city2 = await City.create({name: 'Афины', countryId: greece.id}, {transaction});
+    const city2 = await City.create({name: 'Лассити', countryId: greece.id}, {transaction});
+    const city3 = await City.create({name: 'Ретимно', countryId: greece.id}, {transaction});
+    const city4 = await City.create({name: 'Ханья', countryId: greece.id}, {transaction});
+
+    const hotel = await Hotel.create({name: 'Hersonissos Maris 4*', cityId: city.id}, {transaction});
+    const hotel2 = await Hotel.create({name: 'Crete Golf Club Hotel 5*', cityId: city.id}, {transaction});
+    const hotel3 = await Hotel.create({name: 'Harma Boutique Hotel 4*', cityId: city.id}, {transaction});
+    const hotel4 = await Hotel.create({name: 'Imperial Belvedere Hotel 4*', cityId: city.id}, {transaction});
+    const hotel5 = await Hotel.create({name: 'Serenity Blue Hotel 4*', cityId: city.id}, {transaction});
+    const hotel6 = await Hotel.create({name: 'Sergios Hotel 3*', cityId: city.id}, {transaction});
+    const hotel7 = await Hotel.create({name: 'Central Hersonissos Hotel 4*', cityId: city.id}, {transaction});
+    const hotel8 = await Hotel.create({name: 'Palmera Beach Hotel & Spa 4*', cityId: city.id}, {transaction});
+    const hotel9 = await Hotel.create({name: 'Heronissos Hotel 4*', cityId: city.id}, {transaction});
+    const hotel0 = await Hotel.create({name: 'Thalia Hotel 3*', cityId: city.id}, {transaction});
 
     russia = await Country.create({name: 'Россия'}, {transaction});
-    const city3 = await City.create({name: 'Иннополис', countryId: russia.id}, {transaction});
-    const city4 = await City.create({name: 'Новокубанск', countryId: russia.id}, {transaction});
+    const city5 = await City.create({name: 'Иннополис', countryId: russia.id}, {transaction});
+    const city6 = await City.create({name: 'Новокубанск', countryId: russia.id}, {transaction});
 
     // --------------------------------------------------
     //
