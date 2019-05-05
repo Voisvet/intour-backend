@@ -107,7 +107,11 @@ router.get('/regions', async (req, res) => {
     const countries = await db.sequelize.model('Country').findAll({
       include: [{
         model: db.sequelize.model('City'),
-        as: 'Cities'
+        as: 'Cities',
+        include: [{
+          model: db.sequelize.model('Hotel'),
+          as: 'Hotels'
+        }]
       }]
     });
 
@@ -116,7 +120,11 @@ router.get('/regions', async (req, res) => {
       id: country.id,
       cities: country.Cities.map(city => ({
         name: city.name,
-        id: city.id
+        id: city.id,
+        hotels: city.Hotels.map(hotel => ({
+          name: hotel.name,
+          id: hotel.id
+        }))
       }))
     }));
 
@@ -124,6 +132,7 @@ router.get('/regions', async (req, res) => {
       regions
     })
   } catch (err) {
+    console.error(err);
     res.status(500).send({errorMessage: 'Database is not available now. Try again later.'});
   }
 });

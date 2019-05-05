@@ -5,7 +5,7 @@
     "database": "intour-backend-db",
     "host": "80.93.182.76",
     "dialect": "mysql",
-    "logging": false
+    "logging": true
   },
   "test": {
     "username": "intour-backend-db",
