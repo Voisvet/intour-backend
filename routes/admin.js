@@ -29,8 +29,17 @@ router.get('/token', async (req, res) => {
     });
 
     if (user && ['agent', 'operator', 'admin'].includes(user.accountType)) {
+      let userName = 'Administrator';
+      if (user.accountType === 'agent') {
+        const agent = await user.getAgent();
+        userName = agent.name;
+      } else if (user.accountType === 'operator') {
+        const operator = await user.getExcursionOperator();
+        userName = operator.name;
+      }
       res.send({
         token: jwt.sign({
+          userName,
           userId: user.id,
           operatorId: user.operatorId,
           agentId: user.agentId,
