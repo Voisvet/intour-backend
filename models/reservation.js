@@ -70,6 +70,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     paymentStatus: {
       type: DataTypes.ENUM('pending', 'waiting_for_capture', 'succeeded', 'canceled')
+    },
+    hotelId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Hotels',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL'
     }
   }, {});
   Reservetion.associate = function(models) {
@@ -81,6 +90,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'reservationId',
       targetKey: 'id',
       as: 'Reservation'
+    });
+    Reservetion.belongsTo(models.Hotel, {
+      foreignKey: 'hotelId',
+      targetKey: 'id'
     });
   };
   return Reservetion;
