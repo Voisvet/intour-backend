@@ -12,7 +12,10 @@ const adminRouter = require('./routes/admin');
 const serviceRouter = require('./routes/service');
 
 const corsOptions = {
-  origin: 'http://80.93.182.76/',
+  origin: [
+    'http://80.93.182.76',
+    'http://localhost'
+  ],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
