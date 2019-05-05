@@ -387,9 +387,12 @@ router.get('/reservations/:id', validators.id, async (req, res) => {
   const endHours = (+splittedTime[0] + Math.floor(reservation.Excursion.duration / 60)) % 24;
   const endMinutes = +splittedTime[1] + reservation.Excursion.duration % 60;
 
+  const hotel = await reservation.getHotel();
+
   res.send({
     reservation: {
       id: reservation.id,
+      hotel: hotel.name,
       title: reservation.Excursion.title,
       images: reservation.Excursion.Images.map(image => config['imageServerBaseUrl'] + image.link),
       start_time: reservation.excursionTime,
