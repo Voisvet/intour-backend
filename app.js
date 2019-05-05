@@ -4,37 +4,43 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const logger = require('morgan');
+const rfs = require('rotating-file-stream');
 const fileUpload = require('express-fileupload');
+
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config/config')[env];
 
 const publicRouter = require('./routes/public');
 const userRouter = require('./routes/user');
 const adminRouter = require('./routes/admin');
 const serviceRouter = require('./routes/service');
 
-const corsOptions = {
-  origin: [
-    'http://80.93.182.76',
-    'http://localhost'
-  ],
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-
 const app = express();
 
-// view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
-
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(fileUpload());
-app.use(express.static(path.join(__dirname, 'public'))); // Temporary solution, static assets need to be served by nginx
 
+const requestLogStream = rfs('requests.log', {
+  interval: '1d',
+  path: path.join(__dirname, 'logs')
+});
+console.log(config.logSettings.format);
+app.use(logger(config.logSettings.format, { stream: requestLogStream }));
+app.use(logger(config.logSettings.format, {
+  skip: (req, res) => res.statusCode < 400 && config.logSettings.skipSuccess
+}));
+
+const corsOptions = {
+  origin: config.corsWhiteList,
+  optionsSuccessStatus: 200
+};
 app.use(cors(corsOptions));
 
 app.use('/user', userRouter);
+
+app.use(express.static(path.join(__dirname, 'public'))); // Temporary solution, static assets need to be served by nginx
 app.use('/admin', adminRouter);
 app.use('/service', serviceRouter);
 app.use('/', publicRouter);

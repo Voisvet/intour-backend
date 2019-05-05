@@ -9,7 +9,14 @@
       "secretKey": "test_BLYs7p8FC9ElUamQwuR50grA4ac00lf22mx6V5OoDYU",
       "kassaApiUrl": "https://payment.yandex.net/api/v3",
       "currency": "RUB"
-    }
+    },
+    "logSettings": {
+      "format": "dev",
+      "skipSuccess": false
+    },
+    "corsWhiteList": [
+      "http://localhost"
+    ]
   },
   "test": {
     "hashSecret": "thisisasecretstring",
@@ -21,7 +28,14 @@
       "secretKey": "test_BLYs7p8FC9ElUamQwuR50grA4ac00lf22mx6V5OoDYU",
       "kassaApiUrl": "https://payment.yandex.net/api/v3",
       "currency": "RUB"
-    }
+    },
+    "logSettings": {
+      "format": "dev",
+      "skipSuccess": false
+    },
+    "corsWhiteList": [
+      "http://localhost"
+    ]
   },
   "preprod": {
     "hashSecret": "thisisasecretstring",
@@ -33,7 +47,15 @@
       "secretKey": "test_BLYs7p8FC9ElUamQwuR50grA4ac00lf22mx6V5OoDYU",
       "kassaApiUrl": "https://payment.yandex.net/api/v3",
       "currency": "RUB"
-    }
+    },
+    "logSettings": {
+      "format": ":date[iso] :remote-addr :status :method :url :response-time ms",
+      "skipSuccess": true
+    },
+    "corsWhiteList": [
+      "http://80.93.182.76",
+      "https://80.93.182.76"
+    ]
   },
   "production": {
     "hashSecret": "",
@@ -45,6 +67,14 @@
       "secretKey": "",
       "kassaApiUrl": "https://payment.yandex.net/api/v3",
       "currency": "RUB"
-    }
+    },
+    "logSettings": {
+      "format": ":date[iso] :remote-addr :status :method :url :response-time ms",
+      "skipSuccess": true
+    },
+    "corsWhiteList": [
+      "http://80.93.182.76",
+      "https://80.93.182.76"
+    ]
   }
 }
