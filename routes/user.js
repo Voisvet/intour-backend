@@ -335,10 +335,6 @@ router.get('/reservations', async (req, res) => {
   res.send({
     reservations: reservations.map(reservation => {
       const splittedTime = reservation.excursionTime.split(":");
-      const totalTime = +splittedTime[0] * 60 + +splittedTime[1] + reservation.Excursion.duration;
-
-      const endHours = Math.floor(totalTime / 60);
-      const endMinutes = totalTime % 60;
 
       return {
         id: reservation.id,
@@ -346,7 +342,7 @@ router.get('/reservations', async (req, res) => {
         total_cost: +reservation.totalCost,
         date: +new Date(reservation.excursionDate),
         start_time: `${splittedTime[0]}:${splittedTime[1]}`,
-        end_time: `${endHours < 10 ? '0' + endHours : endHours}:${endMinutes < 10 ? '0' + endMinutes : endMinutes}`,
+        end_time: helpers.computeEndTime(reservation.excursionTime, reservation.Excursion.duration),
         status: reservation.status,
         adult_tickets_amount: reservation.amountOfAdultTickets,
         child_tickets_amount: reservation.amountOfChildTickets
@@ -382,11 +378,7 @@ router.get('/reservations/:id', validators.id, async (req, res) => {
     res.status(404).send({errorMessage: 'Reservation not found'});
     return;
   }
-
-  const splittedTime = reservation.excursionTime.split(":");
-  const endHours = (+splittedTime[0] + Math.floor(reservation.Excursion.duration / 60)) % 24;
-  const endMinutes = +splittedTime[1] + reservation.Excursion.duration % 60;
-
+  
   const hotel = await reservation.getHotel();
 
   res.send({
@@ -396,7 +388,7 @@ router.get('/reservations/:id', validators.id, async (req, res) => {
       title: reservation.Excursion.title,
       images: reservation.Excursion.Images.map(image => config['imageServerBaseUrl'] + image.link),
       start_time: reservation.excursionTime,
-      end_time: `${endHours}:${endMinutes}:00`,
+      end_time: helpers.computeEndTime(reservation.excursionTime, reservation.Excursion.duration),
       duration: reservation.Excursion.duration,
       type: reservation.Excursion.type,
       services: reservation.Excursion.services,
